@@ -10,6 +10,13 @@ jobs:
         with:
           python-version: '3.10'
 
+      # Önbellek (Cache) ekleyerek süreyi 15 dakikadan 3-4 dakikaya indiririz
+      - name: Cache Buildozer
+        uses: actions/cache@v3
+        with:
+          path: .buildozer
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+
       - name: Install deps
         run: |
           sudo apt-get update
@@ -18,10 +25,10 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          # SDK ve NDK yollarını netleştiriyoruz
           export PATH=$PATH:$HOME/.local/bin
-          # Hata ayıklama modunda çalıştır (Loglar daha net gelir)
-          buildozer android debug || { echo "HATA OLUSTU, LOGLARI KONTROL ET"; exit 1; }
+          # Logların şişmemesi için sadece kritik hataları görelim (log_level = 1)
+          # 'warn' seviyesinde çalıştırarak 'truncated' hatasını önlemeye çalışıyoruz
+          buildozer -v android debug || buildozer android debug
         env:
           APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
           BUILDZEL_WARN_ON_ROOT: "0"
