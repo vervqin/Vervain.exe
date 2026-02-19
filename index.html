@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VERVAIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#030b07;--surf:#0a1a10;--surf2:#0f2418;--border:#1a3d24;--accent:#2eff7a;--adim:#1a9945;--aglow:rgba(46,255,122,0.15);--text:#c8f0d5;--tdim:#5a8a6b;--tmut:#2d5c3d;--red:#ff4a4a;--yellow:#ffd54a}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(46,255,122,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(46,255,122,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 16px}
+header{padding:36px 0 24px;text-align:center}
+.logo{font-family:'Space Mono',monospace;font-size:clamp(40px,12vw,80px);font-weight:700;color:var(--accent);text-shadow:0 0 40px rgba(46,255,122,0.6),0 0 80px rgba(46,255,122,0.3);letter-spacing:-2px;animation:glow 3s ease-in-out infinite}
+@keyframes glow{0%,100%{text-shadow:0 0 40px rgba(46,255,122,0.6)}50%{text-shadow:0 0 80px rgba(46,255,122,0.9),0 0 120px rgba(46,255,122,0.4)}}
+.sub{margin-top:6px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--tdim);text-transform:uppercase}
+.badge{display:inline-block;margin-top:12px;padding:5px 14px;background:rgba(46,255,122,0.05);border:1px solid var(--border);border-radius:20px;font-family:'Space Mono',monospace;font-size:10px;color:var(--adim);letter-spacing:2px}
+.sbox{display:flex;align-items:center;gap:8px;background:var(--surf);border:1px solid var(--border);border-radius:4px;padding:6px 6px 6px 16px;margin:32px 0 20px;transition:.3s}
+.sbox:focus-within{border-color:var(--adim);box-shadow:0 0 0 1px var(--adim),0 0 24px var(--aglow)}
+#inp{flex:1;background:transparent;border:none;outline:none;font-family:'Space Mono',monospace;font-size:16px;color:var(--text);caret-color:var(--accent);padding:12px 0}
+#inp::placeholder{color:var(--tmut)}
+#btn{padding:12px 22px;background:var(--accent);border:none;border-radius:2px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#000;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:.2s;flex-shrink:0}
+#btn:hover:not(:disabled){background:#5fffa0}
+#btn:disabled{opacity:.5;cursor:not-allowed}
+#stopbtn{display:none;padding:12px 14px;background:transparent;border:1px solid var(--red);border-radius:2px;font-family:'Space Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;transition:.2s;flex-shrink:0}
+.parea{display:none;margin-bottom:20px}
+.parea.on{display:block}
+.ph{display:flex;justify-content:space-between;margin-bottom:8px}
+.pl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--tdim);text-transform:uppercase}
+.pn{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent)}
+.pt{height:3px;background:var(--surf2);border-radius:2px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--adim),var(--accent));width:0%;transition:width .3s;box-shadow:0 0 8px var(--aglow)}
+.ps{margin-top:6px;font-family:'Space Mono',monospace;font-size:10px;color:var(--tmut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats{display:none;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.stat{flex:1;min-width:100px;background:var(--surf);border:1px solid var(--border);border-radius:4px;padding:12px;text-align:center}
+.sn{font-family:'Space Mono',monospace;font-size:22px;font-weight:700}
+.sn.f{color:var(--accent)}.sn.nf{color:var(--red)}.sn.u{color:var(--yellow)}.sn.t{color:var(--tdim)}
+.sl{margin-top:3px;font-size:9px;letter-spacing:2px;color:var(--tmut);text-transform:uppercase}
+.rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.rt{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--tdim);text-transform:uppercase}
+.ftabs{display:flex;gap:6px;flex-wrap:wrap}
+.ftab{padding:4px 10px;font-family:'Space Mono',monospace;font-size:9px;border:1px solid var(--border);background:transparent;color:var(--tdim);border-radius:2px;cursor:pointer;transition:.2s}
+.ftab.on,.ftab:hover{border-color:var(--adim);color:var(--accent);background:rgba(46,255,122,0.05)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:7px}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:4px;padding:10px 13px;display:flex;align-items:center;gap:10px;animation:cin .3s ease forwards;opacity:0;transform:translateY(6px)}
+@keyframes cin{to{opacity:1;transform:translateY(0)}}
+.card.f{border-left:2px solid var(--accent)}
+.card.nf{border-left:2px solid var(--tmut);opacity:.35}
+.card.u{border-left:2px solid var(--yellow);opacity:.55}
+.ci{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.cinfo{flex:1;min-width:0}
+.cn{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl{font-family:'Space Mono',monospace;font-size:8px;color:var(--adim);text-decoration:none;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.cl:hover{color:var(--accent)}
+.cst{flex-shrink:0;font-size:15px}
+.cst.f{color:var(--accent)}.cst.u{color:var(--yellow)}
+.intsec{margin-top:28px;padding:24px;background:var(--surf);border:1px solid var(--border);border-radius:4px;position:relative;overflow:hidden}
+.intsec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.it{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--tdim);text-transform:uppercase;margin-bottom:18px}
+.ig{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:6px;padding:7px 13px;background:var(--surf2);border:1px solid var(--border);border-radius:2px;animation:cin .5s ease forwards;opacity:0}
+.cemoji{font-size:14px}.clabel{font-size:12px;font-weight:700}.ccount{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent);background:rgba(46,255,122,0.05);padding:2px 6px;border-radius:2px}
+footer{margin-top:50px;padding:20px 0 36px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--tmut);letter-spacing:2px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@media(max-width:480px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">VERVAIN</div>
+  <div class="sub">Turkiye OSINT — Kullanici Adi Arama</div>
+  <div class="badge" id="bcnt">yukleniyor...</div>
+</header>
+<div class="sbox">
+  <input type="text" id="inp" placeholder="kullanici adi girin..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <button id="btn" onclick="startScan()">Tara</button>
+  <button id="stopbtn" onclick="stop()">Durdur</button>
+</div>
+<div class="parea" id="pa">
+  <div class="ph"><span class="pl">Tarama</span><span class="pn" id="pn">0 / 0</span></div>
+  <div class="pt"><div class="pf" id="pf"></div></div>
+  <div class="ps" id="ps">Baslatiliyor...</div>
+</div>
+<div class="stats" id="stats">
+  <div class="stat"><div class="sn f" id="sf">0</div><div class="sl">Bulundu</div></div>
+  <div class="stat"><div class="sn nf" id="snf">0</div><div class="sl">Bulunamadi</div></div>
+  <div class="stat"><div class="sn u" id="su">0</div><div class="sl">Belirsiz</div></div>
+  <div class="stat"><div class="sn t" id="st">0</div><div class="sl">Toplam</div></div>
+</div>
+<div id="rsec" style="display:none">
+  <div class="rh">
+    <span class="rt">Sonuclar</span>
+    <div class="ftabs">
+      <button class="ftab on" onclick="filt('all',this)">Tumu</button>
+      <button class="ftab" onclick="filt('f',this)">Bulundu</button>
+      <button class="ftab" onclick="filt('u',this)">Belirsiz</button>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="intsec" id="intsec" style="display:none">
+  <div class="it">Hedefin Ilgi Alanlari</div>
+  <div class="ig" id="ig"></div>
+</div>
+<footer>VERVAIN — Turkiye OSINT / Yalnizca arastirma amaclidir</footer>
+</div>
+<script>
+var scanning=false,cancel=false,catHits={},totalCount=0;
+var ICONS={sosyal:"grup",oyun:"gamepad",kodlama:"kod",hacking:"kalkan",kripto:"bitcoin",finans:"para",alisveris:"sepet",muzik:"muzik",video:"video",seyahat:"ucak",yemek:"yemek",spor:"top",egitim:"kitap",sanat:"boya",fotograf:"kamera",is:"canta",dating:"kalp",anime:"yildiz",blog:"kalem",tasarim:"firca",teknoloji:"dis",topluluk:"ev",donanim:"ekran","yapay zeka":"robot",startup:"roket",kariyer:"bina",sinema:"film",dizi:"tv"};
+
+fetch('/api/count').then(function(r){return r.json()}).then(function(d){
+  document.getElementById('bcnt').textContent=d.count+' site taranacak';
+});
+
+document.getElementById('inp').addEventListener('keypress',function(e){if(e.key==='Enter')startScan()});
+
+function stop(){cancel=true;document.getElementById('stopbtn').style.display='none';}
+
+function startScan(){
+  var u=document.getElementById('inp').value.trim();
+  if(!u||scanning)return;
+  scanning=true;cancel=false;catHits={};totalCount=0;
+  document.getElementById('grid').innerHTML='';
+  document.getElementById('ig').innerHTML='';
+  document.getElementById('pa').classList.add('on');
+  document.getElementById('stats').style.display='flex';
+  document.getElementById('rsec').style.display='block';
+  document.getElementById('intsec').style.display='none';
+  document.getElementById('btn').disabled=true;
+  document.getElementById('stopbtn').style.display='inline-block';
+  ['sf','snf','su','st'].forEach(function(id){document.getElementById(id).textContent='0'});
+  scan(u,0);
+}
+
+function scan(u,i){
+  fetch('/api/count').then(function(r){return r.json()}).then(function(d){
+    var total=d.count;
+    if(i>=total||cancel){finish();return;}
+    fetch('/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,idx:i})})
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var pct=((i+1)/total*100).toFixed(1);
+      document.getElementById('pf').style.width=pct+'%';
+      document.getElementById('pn').textContent=(i+1)+' / '+total;
+      document.getElementById('ps').textContent='Tariyor: '+d.name;
+      totalCount++;
+      document.getElementById('st').textContent=totalCount;
+      if(d.found===true){
+        var n=parseInt(document.getElementById('sf').textContent)+1;
+        document.getElementById('sf').textContent=n;
+        if(d.cat)d.cat.forEach(function(c){catHits[c]=(catHits[c]||0)+1});
+        addCard(d,false);
+      }else if(d.found===false){
+        var n=parseInt(document.getElementById('snf').textContent)+1;
+        document.getElementById('snf').textContent=n;
+      }else{
+        var n=parseInt(document.getElementById('su').textContent)+1;
+        document.getElementById('su').textContent=n;
+        addCard(d,true);
+      }
+      setTimeout(function(){scan(u,i+1)},80);
+    }).catch(function(){setTimeout(function(){scan(u,i+1)},80)});
+  });
+}
+
+function addCard(d,unknown){
+  if(d.found===false)return;
+  var c=document.createElement('div');
+  var cls=d.found===true?'f':'u';
+  var icon=d.found===true?'[+]':'[?]';
+  var flag=d.tr?'TR':'GL';
+  var shorturl=d.url.length>40?d.url.substring(0,40)+'...':d.url;
+  c.className='card '+cls;
+  c.innerHTML='<div class="ci">'+(d.tr?'🇹🇷':'🌐')+'</div><div class="cinfo"><div class="cn">'+esc(d.name)+'</div><a class="cl" href="'+esc(d.url)+'" target="_blank">'+esc(shorturl)+'</a></div><div class="cst '+cls+'">'+(d.found===true?'✓':'?')+'</div>';
+  document.getElementById('grid').appendChild(c);
+}
+
+function filt(type,btn){
+  document.querySelectorAll('.ftab').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+  document.querySelectorAll('.card').forEach(function(c){
+    if(type==='all')c.style.display='flex';
+    else if(type==='f')c.style.display=c.classList.contains('f')?'flex':'none';
+    else c.style.display=c.classList.contains('u')?'flex':'none';
+  });
+}
+
+function finish(){
+  scanning=false;
+  document.getElementById('btn').disabled=false;
+  document.getElementById('stopbtn').style.display='none';
+  document.getElementById('ps').textContent='Tarama tamamlandi!';
+  renderInterests();
+  document.getElementById('intsec').style.display='block';
+}
+
+function renderInterests(){
+  var ig=document.getElementById('ig');
+  ig.innerHTML='';
+  var sorted=Object.entries(catHits).sort(function(a,b){return b[1]-a[1]}).slice(0,16);
+  if(!sorted.length){ig.innerHTML='<span style="color:var(--tmut);font-family:Space Mono;font-size:11px">Profil bulunamadi.</span>';return;}
+  sorted.forEach(function(item,i){
+    var cat=item[0],cnt=item[1];
+    var emojis={sosyal:'👥',oyun:'🎮',kodlama:'💻',hacking:'🔒',kripto:'₿',finans:'💰',alisveris:'🛍️',muzik:'🎵',video:'🎬',seyahat:'✈️',yemek:'🍽️',spor:'⚽',egitim:'📚',sanat:'🎨',fotograf:'📷',is:'💼',dating:'💕',anime:'🇯🇵',blog:'✍️',tasarim:'🖌️',teknoloji:'🔧',topluluk:'🏛️',donanim:'🖥️',startup:'🚀',kariyer:'🏢',sinema:'🎥',dizi:'📺'};
+    var emoji=emojis[cat]||'📌';
+    var chip=document.createElement('div');
+    chip.className='chip';
+    chip.style.animationDelay=(i*0.07)+'s';
+    chip.innerHTML='<span class="cemoji">'+emoji+'</span><span class="clabel">'+cat+'</span><span class="ccount">'+cnt+'</span>';
+    ig.appendChild(chip);
+  });
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+</script>
+</body>
+</html>
