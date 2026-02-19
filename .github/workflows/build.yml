@@ -18,12 +18,15 @@ jobs:
 
       - name: Build APK
         run: |
-          # Android lisanslarını otomatik olarak onaylar
-          yes | buildozer android clean
-          yes | buildozer android debug
+          # Önce lisansları kabul etmeyi zorla
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          # Buildozer'ın kendi içindeki 'yes' mekanizmasını kullan
+          buildozer android debug || buildozer android debug
         env:
-          # Buildozer'ın lisans sorgularını otomatik geçmesi için ek önlem
-          ACCEPT_SDK_LICENSE: "yes"
+          # Lisansları otomatik onaylaması için Buildozer'a talimat
+          APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
+          BUILDZEL_WARN_ON_ROOT: "0"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
