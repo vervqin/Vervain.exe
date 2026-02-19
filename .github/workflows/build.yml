@@ -1,38 +1,14 @@
-name: Build APK
-on: [push, workflow_dispatch]
-jobs:
-  build:
-    runs-on: ubuntu-22.04 # En kararlı sürüm bu, macera aramaya gerek yok
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Cache Buildozer
-        uses: actions/cache@v4
-        with:
-          path: .buildozer
-          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
-          restore-keys: |
-            ${{ runner.os }}-buildozer-
-
-      - name: Install deps
-        run: |
-          sudo apt-get update
-          # Sorun çıkaran libtinfo5 yerine libtinfo6 ekledik ve diğer eksikleri tamamladık
-          sudo apt-get install -y build-essential git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev python3-dev
-          pip3 install --user --upgrade buildozer cython==0.29.33 virtualenv
-
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          # Lisansları ve build sürecini sessizce hallet
-          buildozer android debug || buildozer android debug
+          # Önce tüm Android lisanslarını otomatik olarak 'yes' diyerek onayla
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          yes | /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk --licenses || true
+          
+          # Şimdi derlemeyi başlat
+          buildozer android debug
         env:
           APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
           BUILDZEL_WARN_ON_ROOT: "0"
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Vervain-APK
-          path: bin/*.apk
           
