@@ -5,18 +5,29 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
       - name: Install deps
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip build-essential git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
-          pip3 install buildozer==1.5.0 cython==0.29.36 setuptools
+          pip3 install buildozer==1.5.0 cython==0.29.33 setuptools
+
       - name: Build APK
-        run: buildozer android debug
+        run: |
+          # Android lisanslarını otomatik olarak onaylar
+          yes | buildozer android clean
+          yes | buildozer android debug
+        env:
+          # Buildozer'ın lisans sorgularını otomatik geçmesi için ek önlem
+          ACCEPT_SDK_LICENSE: "yes"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Vervain-APK
           path: bin/*.apk
+          
