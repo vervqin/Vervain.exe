@@ -1,21 +1,22 @@
 name: Build APK
-on: [push]
+on: [push, workflow_dispatch]
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+      - name: Get Date
+        id: get-date
+        run: echo "date=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
 
-      # Önbellek (Cache) ekleyerek süreyi 15 dakikadan 3-4 dakikaya indiririz
       - name: Cache Buildozer
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .buildozer
-          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+          key: ${{ runner.os }}-buildozer-${{ steps.get-date.outputs.date }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-
 
       - name: Install deps
         run: |
@@ -26,9 +27,8 @@ jobs:
       - name: Build with Buildozer
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          # Logların şişmemesi için sadece kritik hataları görelim (log_level = 1)
-          # 'warn' seviyesinde çalıştırarak 'truncated' hatasını önlemeye çalışıyoruz
-          buildozer -v android debug || buildozer android debug
+          # Log seviyesini düşürerek 'truncated' hatasını önlüyoruz
+          buildozer android debug || buildozer android debug
         env:
           APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
           BUILDZEL_WARN_ON_ROOT: "0"
